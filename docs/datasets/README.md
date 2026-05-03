@@ -1,6 +1,6 @@
 # Datasets
 
-The repo ships configs for three dataset families: **DINO-WM** (5 simulated environments), **RT-1 fractal** (real-robot LeRobot), and **CSGO** (Counter-Strike deathmatch). All datasets feed through a common `WorldModelDataset` interface — see `src/wm_datasets/`.
+The repo ships configs for four dataset families: **DINO-WM** (5 simulated environments), **RT-1 fractal** (real-robot LeRobot), **CSGO** (Counter-Strike deathmatch), and **BlockWorld** (FlowM 3D memory benchmark). All datasets feed through a common `WorldModelDataset` interface — see `src/wm_datasets/`.
 
 <div align="center">
 
@@ -15,6 +15,8 @@ export DATASET_DIR=/path/to/dino_wm_data       # DINO-WM root
 export CSGO_DATA_DIR=/path/to/csgo             # CSGO root (HDF5 files)
 export RT1_DATA_ROOT=/path/to/rt1_fractal      # RT-1 (LeRobot mirror)
 ```
+
+For BlockWorld, set `DATASET_DIR` to the parent directory containing `blockworld/`.
 
 Or use the gitignored `src/configs/local/paths.yaml` (template at `paths.yaml.example`). See [config_system.md](../config_system.md#path-configuration).
 
@@ -31,6 +33,7 @@ Or use the gitignored `src/configs/local/paths.yaml` (template at `paths.yaml.ex
 | DINO-WM Granular | ~500 | ~100–200 | 256² | 2 | exhaustive | deformable |
 | RT-1 (fractal) | 87k | ~40–60 | 256² | 7 | random | LeRobot v2.0, frame_interval=1 |
 | CSGO | 5500 | 1000 | 320×512 | 51 | random | fixed val start indices, frame_interval=1 |
+| BlockWorld | config-dependent | 70–140 | 128² | 5 | random | FlowM 3D memory benchmark |
 
 </div>
 
@@ -198,6 +201,65 @@ The shipped checkpoints are NanoWM-L/2 trained for 50k or 100k steps. See [train
 - Actions: ~10 MB/episode (cached in memory)
 - Frames: ~123 MB/episode (loaded on demand — never cached)
 - Total: ~675 GB on disk; RAM stays bounded by the per-batch decode
+
+---
+
+## BlockWorld
+
+FlowM's 3D Dynamic BlockWorld memory benchmark. Source: [hlillemark/flowm](https://github.com/hlillemark/flowm). The dataset uses RGB videos plus per-frame discrete actions; nano-world-model exposes those actions as 5-D one-hot vectors.
+
+### Download
+
+Use the FlowM dataset downloader and place the extracted dataset under `${DATASET_DIR}/blockworld`:
+
+```bash
+cd /path/to/flowm
+bash ./download_datasets.sh --dataset blockworld --configs dynamic --splits train,validation
+```
+
+### Data format
+
+Expected layout:
+
+```text
+${DATASET_DIR}/blockworld/
+├── sunday_v2_training/
+│   └── 0/
+│       ├── 0000_rgb.mp4
+│       ├── 0000_depth.mp4
+│       └── 0000_actions.pt
+└── sunday_v2_validation/
+```
+
+The `*_actions.pt` sidecar must contain either an `actions` tensor of integer action ids or an already-vectorized `[T, 5]` tensor. Depth videos are left untouched; the current integration is RGB-only to match the existing NanoWM video/action interface.
+
+### Config
+
+`src/configs/dataset/memory/blockworld.yaml`:
+
+```yaml
+name: "blockworld"
+frame_interval: 1
+loader:
+  data_path_train: "${dataset_dir}/blockworld/sunday_v2_training"
+  data_path_val: "${dataset_dir}/blockworld/sunday_v2_validation"
+  normalize_action: False
+  train_slice_mode: "random"
+  val_slice_mode: "exhaustive"
+spec:
+  action_dim: 5
+```
+
+### Train command
+
+```bash
+python src/main.py dataset=memory/blockworld model=nanowm_b2
+```
+
+### Memory
+
+- Actions are small and cached on first trajectory access.
+- Frames are decoded on demand from MP4 and are never cached by the data source.
 
 ---
 

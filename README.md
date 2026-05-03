@@ -48,7 +48,7 @@ mkdir -p pretrained_models/i3d && curl -L \
     -o pretrained_models/i3d/i3d_torchscript.pt
 ```
 
-For dataset downloads (DINO-WM, RT-1, CSGO), see [docs/datasets/README.md](docs/datasets/README.md).
+For dataset downloads (DINO-WM, RT-1, CSGO, BlockWorld), see [docs/datasets/README.md](docs/datasets/README.md).
 
 ## 🥷 Train your first model
 
@@ -139,7 +139,7 @@ NanoWM rollouts can be used directly for downstream applications, including long
 - **[docs/config_system.md](docs/config_system.md)** — Hydra config layout, overrides, environment variables
 - **[docs/training.md](docs/training.md)** — training workflow, design choices, ablation tables, all checkpoints
 - **[docs/evaluation.md](docs/evaluation.md)** — evaluation workflow, metric definitions, full result tables
-- **[docs/datasets/README.md](docs/datasets/README.md)** — DINO-WM / RT-1 / CSGO formats, downloads, splits
+- **[docs/datasets/README.md](docs/datasets/README.md)** — DINO-WM / RT-1 / CSGO / BlockWorld formats, downloads, splits
 - **[docs/applications/planning.md](docs/applications/planning.md)** — MPC + CEM model-predictive control
 - **[docs/applications/long_rollout.md](docs/applications/long_rollout.md)** — long-horizon autoregressive rollout
 - **[docs/applications/video_to_3d.md](docs/applications/video_to_3d.md)** — Depth Anything 3 point cloud pipeline

@@ -77,6 +77,7 @@ train_dataset, val_dataset = create_train_val_datasets(
 | **pusht** | 18,685 | 5 | 2 | ~109 |
 | **rope** | TBD | TBD | TBD | TBD |
 | **granular** | TBD | TBD | TBD | TBD |
+| **blockworld** | config-dependent | 0 | 5 | 70–140 |
 
 </div>
 
@@ -130,6 +131,7 @@ def create_world_model_dataset(
 - `use_relative_actions` (pusht): Use relative vs absolute actions
 - `action_scale` (pusht): Action scaling factor
 - `object_name` (deformable): "rope" or "granular"
+- `action_dim` (blockworld): Number of discrete actions for one-hot encoding
 
 ### Sampling Modes
 

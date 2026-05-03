@@ -1,0 +1,20 @@
+# @package dataset
+loader:
+  n_rollout: null
+  data_path_train: null
+  data_path_val: null
+  split_ratio: 0.9
+  validation_size: 32
+  normalize_state: False
+  normalize_action: False
+  train_slice_mode: "random"
+  val_slice_mode: "exhaustive"
+  stride: 1
+  random_seed: 42
+  validation_fixed_subset_path: null
+  validation_fixed_subset_size: null
+  validation_fixed_subset_seed: 42
+  file_list: null
+  action_dim: 5
+  video_suffix: "_rgb.mp4"
+  action_suffix: "_actions.pt"

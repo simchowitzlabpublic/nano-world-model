@@ -1,0 +1,17 @@
+defaults:
+  - memory/base
+
+name: "blockworld"
+frame_interval: 1
+
+loader:
+  data_path_train: "${dataset_dir}/blockworld/sunday_v2_training"
+  data_path_val: "${dataset_dir}/blockworld/sunday_v2_validation"
+  normalize_action: False
+  resize_mode: "stretch"
+  train_slice_mode: "random"
+  val_slice_mode: "exhaustive"
+  action_dim: 5
+
+spec:
+  action_dim: 5
