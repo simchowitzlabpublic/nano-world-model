@@ -1,0 +1,23 @@
+defaults:
+  - default
+
+# Flow matching variant of the PushT experiment.
+# Identical hyperparameters to dino_wm_pusht except pred_name=flow,
+# noise_schedule is unused (FM uses linear interpolation internally),
+# and zero_terminal_snr / snr_gamma are irrelevant for FM.
+training:
+  max_steps: 100000
+  batch_size: 8
+
+diffusion:
+  pred_name: "flow"
+  # noise_schedule is ignored for flow matching but must be present
+  # to satisfy the Hydra schema — keep the default value.
+  noise_schedule: "squaredcos_cap_v2"
+  diffusion_steps: 1000
+  snr_gamma: 0.0          # unused for FM
+  zero_terminal_snr: false # unused for FM
+  timestep_sampling: "logit_normal"
+  logit_normal_mean: 0.0
+  logit_normal_std: 1.0
+  history_stabilization_level: 0.02

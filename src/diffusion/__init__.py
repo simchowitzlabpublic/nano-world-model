@@ -7,6 +7,7 @@ import torch
 
 from . import gaussian_diffusion as gd
 from .respace import SpacedDiffusion, space_timesteps
+from .flow_matching import FlowMatching
 
 
 def sample_training_timesteps(
@@ -68,6 +69,10 @@ def create_diffusion(
     if timestep_respacing is None or timestep_respacing == "":
         timestep_respacing = [diffusion_steps]
 
+    # Flow matching is a separate code path — no beta schedule, no DDIM.
+    if pred_name == "flow":
+        return FlowMatching(num_timesteps=diffusion_steps, snr_gamma=snr_gamma)
+
     pred_name_map = {
         "eps": gd.PredName.EPSILON,
         "epsilon": gd.PredName.EPSILON,
@@ -76,7 +81,8 @@ def create_diffusion(
     }
     if pred_name not in pred_name_map:
         raise ValueError(
-            f"Unknown pred_name: {pred_name}. Must be one of {sorted(set(pred_name_map))}."
+            f"Unknown pred_name: {pred_name}. Must be one of "
+            f"{sorted(set(pred_name_map)) + ['flow']}."
         )
 
     if pred_name_map[pred_name] == gd.PredName.EPSILON:
