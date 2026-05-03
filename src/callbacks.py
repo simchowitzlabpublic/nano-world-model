@@ -180,7 +180,8 @@ class MetricsLogger(Callback):
                 
                 if mu_pred is not None and mu_true is not None:
                     m = np.square(mu_pred - mu_true).sum()
-                    s, _ = scipy.linalg.sqrtm(np.dot(sigma_pred, sigma_true), disp=False)
+                    _s = scipy.linalg.sqrtm(np.dot(sigma_pred, sigma_true), disp=False)
+                    s = _s[0] if isinstance(_s, tuple) else _s
                     fvd = np.real(m + np.trace(sigma_pred + sigma_true - s * 2))
                     pl_module.log("val_eval/fvd", fvd, on_epoch=True, prog_bar=True, logger=True, sync_dist=False)
                     mainlogger.info(f"Epoch end val fvd: {fvd}")

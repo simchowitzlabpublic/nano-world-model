@@ -86,7 +86,7 @@ def main(args):
     model.eval()
     
     print("Loading VAE...")
-    vae = AutoencoderKL.from_pretrained(args.vae_model_path, subfolder="vae").to(device)
+    vae = AutoencoderKL.from_pretrained(args.vae_model_path).to(device)
     vae.eval()
     vae_precision = getattr(args.experiment.infra, "vae_precision", "fp32")
     

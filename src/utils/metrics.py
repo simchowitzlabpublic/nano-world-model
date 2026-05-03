@@ -238,7 +238,8 @@ class Evaluator():
             sigma_true = np.cov(raw_features_true, rowvar=False)
             sigma_pred = np.cov(raw_features_pred, rowvar=False)
             m = np.square(mu_pred - mu_true).sum()
-            s, _ = scipy.linalg.sqrtm(np.dot(sigma_pred, sigma_true), disp=False)
+            _s = scipy.linalg.sqrtm(np.dot(sigma_pred, sigma_true), disp=False)
+            s = _s[0] if isinstance(_s, tuple) else _s
             fvd = np.real(m + np.trace(sigma_pred + sigma_true - s * 2))
             return fvd
         

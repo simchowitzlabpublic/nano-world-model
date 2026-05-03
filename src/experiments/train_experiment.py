@@ -83,7 +83,7 @@ class NanoWMTrainingModule(LightningModule):
             zero_terminal_snr=args.experiment.diffusion.zero_terminal_snr,
         )
         print(f"[Init] Loading VAE from: {args.vae_model_path}", flush=True)
-        self.vae = AutoencoderKL.from_pretrained(args.vae_model_path, subfolder="vae")
+        self.vae = AutoencoderKL.from_pretrained(args.vae_model_path)
         # Trust whatever VAE was passed in — read its own scaling factor rather
         # than baking in 0.18215 (SD 1.x) or any other constant. PixArt/SDXL use
         # 0.13025, Flux uses 0.3611, etc.
@@ -778,7 +778,7 @@ class TrainExperiment(BaseExperiment):
             val_check_interval=val_check_interval,
             check_val_every_n_epoch=None,
             accumulate_grad_batches=args.experiment.training.gradient_accumulation,
-            precision="bf16-mixed" if args.experiment.infra.mixed_precision else "32",
+            precision="bf16" if args.experiment.infra.mixed_precision else "32",
             num_sanity_val_steps=0,
         )
 
@@ -819,7 +819,7 @@ class TrainExperiment(BaseExperiment):
             enable_checkpointing=False,  # No checkpointing during evaluation
             logger=loggers,
             callbacks=callbacks_list,
-            precision="bf16-mixed" if args.experiment.infra.mixed_precision else "32",
+            precision="bf16" if args.experiment.infra.mixed_precision else "32",
             num_sanity_val_steps=0,
         )
 
