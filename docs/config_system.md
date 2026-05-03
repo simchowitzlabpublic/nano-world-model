@@ -164,6 +164,12 @@ Each dataset family has a `base.yaml` that fixes the schema, plus per-dataset ov
 #             action_dim=51 (keys + mouse), normalize_action=False
 ```
 
+**Memory** (`src/configs/dataset/memory/`):
+```yaml
+# blockworld.yaml — FlowM 3D BlockWorld memory benchmark,
+#                   train_slice_mode=random, action_dim=5 one-hot actions
+```
+
 **RT-1** (`src/configs/dataset/rt1/`):
 ```yaml
 # rt1.yaml — LeRobot HF dataset (IPEC-COMMUNITY/fractal20220817_data_lerobot),

@@ -9,6 +9,7 @@ This module provides a unified data loading pipeline with three layers:
 
 from .data_source import (
     DataSource,
+    BlockWorldDataSource,
     DinoWorldModelDataSource,
     LeRobotDataSource,
     TrajectoryData,
@@ -25,6 +26,7 @@ from .world_model_dataset import (
 __all__ = [
     # DataSource layer
     "DataSource",
+    "BlockWorldDataSource",
     "DinoWorldModelDataSource",
     "LeRobotDataSource",
     "TrajectoryData",

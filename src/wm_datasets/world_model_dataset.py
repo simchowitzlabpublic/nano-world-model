@@ -705,6 +705,7 @@ def create_world_model_dataset(
     datasource_params = {
         'use_relative_actions', 'action_scale', 'object_name',
         'file_list', 'use_auxiliary_state',  # file_list is for CSGO DataSource
+        'action_dim', 'video_suffix', 'action_suffix',  # BlockWorld DataSource
         'root', 'image_key', 'preload_trajectories', 'pad_action_dim',  # LeRobotDataSource
     }
     for key, value in kwargs.items():
@@ -998,6 +999,7 @@ def create_eval_only_dataset(
     datasource_params = {
         'use_relative_actions', 'action_scale', 'object_name',
         'file_list', 'use_auxiliary_state',
+        'action_dim', 'video_suffix', 'action_suffix',
         'root', 'image_key', 'preload_trajectories', 'pad_action_dim',
     }
     for key, value in kwargs.items():

@@ -7,6 +7,7 @@ from typing import Optional
 from .dino_wm import DinoWorldModelDataSource, PushTDataSource, DeformableEnvDataSource
 from .lerobot import LeRobotDataSource
 from .game import CSGODataSource
+from .memory import BlockWorldDataSource
 from .base import DataSource
 
 
@@ -72,7 +73,18 @@ def create_data_source(
             **csgo_kwargs
         )
 
+    if dataset_name == "blockworld":
+        blockworld_kwargs = {
+            k: v for k, v in kwargs.items()
+            if k in ['action_dim', 'file_list', 'video_suffix', 'action_suffix']
+        }
+        return BlockWorldDataSource(
+            data_path=data_path,
+            n_rollout=n_rollout,
+            **blockworld_kwargs,
+        )
+
     raise ValueError(
         f"Unknown dataset: {dataset_name}. "
-        f"Supported: point_maze, wall, pusht, rope, granular, rt1, csgo"
+        f"Supported: point_maze, wall, pusht, rope, granular, rt1, csgo, blockworld"
     )
