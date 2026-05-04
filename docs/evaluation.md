@@ -30,6 +30,9 @@ python src/main.py experiment=evaluate_only \
     dataset.loader.validation_fixed_subset_seed=42
 ```
 
+We provide example scripts under `src/scripts/eval/`, including
+`dino_wm_*.sh`, `rt1.sh`, `csgo.sh`, and ablation evals under `abl_*.sh`.
+
 `experiment=evaluate_only` sets `tasks=[evaluate]` and `validation_size: null` (use the full val set, optionally constrained by `validation_fixed_subset_size`). Outputs land under `${RESULTS_DIR}/<run_dir>/`:
 
 ```

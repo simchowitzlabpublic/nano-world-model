@@ -190,6 +190,13 @@ class FlowMatching:
         """
         if model_kwargs is None:
             model_kwargs = {}
+        if denoised_fn is not None:
+            raise NotImplementedError("FlowMatching does not support denoised_fn.")
+        if clip_denoised:
+            raise NotImplementedError(
+                "FlowMatching does not support clip_denoised=True; pass "
+                "clip_denoised=False."
+            )
 
         curr_t_clamped = curr_t.clamp(min=0)
 
@@ -198,10 +205,6 @@ class FlowMatching:
 
         # Recover x_0 estimate (for logging / clip)
         pred_xstart = self._predict_xstart(x, curr_t_clamped, u)
-        if denoised_fn is not None:
-            pred_xstart = denoised_fn(pred_xstart)
-        if clip_denoised:
-            pred_xstart = pred_xstart.clamp(-1.0, 1.0)
 
         # Continuous time values
         tau_curr = _t_to_tau(curr_t_clamped, self.num_timesteps)   # [B, F]
