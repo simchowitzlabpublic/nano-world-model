@@ -12,7 +12,7 @@ conda env create -f environment.yml && conda activate nanowm
 
 ## Demo: CSGO 100k, 50-frame rollout
 
-50-frame autoregressive rollouts (4-frame context, sequential per-frame DDIM) on 12 held-out CSGO episodes, decoded back to native 280×150 aspect ratio:
+50-frame autoregressive rollouts (4-frame context, sequential per-frame DDIM) on held-out CSGO episodes:
 
 <div align="center">
 
@@ -44,10 +44,10 @@ The `--config` path is the `.hydra/config.yaml` snapshot from the training run t
 | `--rollout_length` | 50 | Frames to predict (must be ≥ history_length) |
 | `--history_length` | 4 | Context frames at start; window slides forward as rollout extends |
 | `--num_sampling_steps` | 50 | DDIM steps per frame (sequential) or per chunk (full_sequence) |
-| `--scheduling_mode` | sequential | `sequential` (frame-by-frame) or `full_sequence` (joint denoising) |
-| `--history_stabilization_level` | 0.02 | Noise level injected into history latents (helps avoid teacher-forcing brittleness) |
-| `--num_samples` | 32 | Number of starting points sampled from the val set |
-| `--batch_size` | 4 | Rollouts processed in parallel |
+| `--scheduling_mode` | sequential | `sequential` (frame-by-frame), `full_sequence` (joint denoising), or `pyramid` |
+| `--history_stabilization_level` | from config | Noise level injected into history latents (helps avoid teacher-forcing brittleness) |
+| `--num_samples` | 1 | Number of starting points sampled from the val set |
+| `--batch_size` | 1 | Rollouts processed in parallel |
 | `--fps` | 8 | Output video frame rate |
 
 </div>
@@ -59,20 +59,21 @@ results/long_rollout/<run>/
 ├── sample_0000_gen.mp4         # generated rollout
 ├── sample_0000_gt.mp4          # ground-truth comparison (if val frames available)
 ├── sample_0000_compare.mp4     # side-by-side
-├── ...
-└── metrics.json                # per-sample PSNR/SSIM/LPIPS vs GT (when GT available)
+└── ...
 ```
+
+`rollout.py` only writes videos. To compute metrics from saved rollouts, use `src/sample/evaluate_metrics.py`.
 
 ## Tips
 
 - **Context length matters**: history_length=4 is the sweet spot for CSGO (3 FPS, ~1.3s of context). For higher-FPS datasets, increase history.
 - **Noise level on history**: bumping `--history_stabilization_level` from 0.02 → 0.05 helps when the model drifts on long rollouts; too high (>0.1) starts to wash out detail.
 - **DDIM step budget**: `--num_sampling_steps 50` is the quality / speed knee. Drop to 25 for quick previews; raise to 250 for top quality.
-- **Native aspect ratio**: CSGO's native frame is 150×280 (1.87:1). Trained at stretched 320×512 (≈1.6:1). The rollout script decodes back to native automatically when it detects CSGO config; for other stretched datasets pass `--target_height` and `--target_width`.
+- **Native aspect ratio**: Rollout videos are saved at the configured dataset resolution. If a downstream tool needs the original frame geometry, restore it at that stage; the point-cloud script below accepts `--native_res 150 280` for CSGO.
 
 ## Going from rollout to 3D
 
-Long-rollout videos feed naturally into the [video → 3D point cloud pipeline](video_to_3d.md). For CSGO, restore the native aspect ratio:
+Long-rollout videos feed naturally into the [video → 3D point cloud pipeline](video_to_3d.md). For CSGO, restore the native aspect ratio before depth inference:
 
 ```bash
 python src/scripts/video_to_pointcloud.py \
