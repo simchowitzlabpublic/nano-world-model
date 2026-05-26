@@ -17,6 +17,13 @@ A minimalist repository for training video world models based on diffusion-forci
 
 </div>
 
+## News and Updates
+- 🚩 **2026-05:** We release [📕 Technical Report](https://arxiv.org/abs/2605.23993) on arxiv, check it out!
+
+- 🚩 **2026-05:** We release all model checkpoints on [🤗 huggingface](https://huggingface.co/collections/knightnemo/nano-world-model).
+
+- 🚩 **2026-05:** We release code for training, inference and evaluation.
+
 ## Key Features
 
 - 🚀 **Instant Start** — Minimal dependencies, easy data loading. From clone to first rollout in minutes.
