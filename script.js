@@ -616,6 +616,7 @@ function injectContent() {
     // Hero
     set('hero-title',    c.hero.title);
     set('hero-subtitle', c.hero.subtitle);
+    document.querySelectorAll('[data-link="arxiv"]').forEach(a => { a.href = c.hero.links.arxiv; });
     document.querySelectorAll('[data-link="github"]').forEach(a => { a.href = c.hero.links.github; });
     document.querySelectorAll('[data-link="models"]').forEach(a => { a.href = c.hero.links.models; });
     document.querySelectorAll('[data-link="twitter"]').forEach(a => { a.href = c.hero.links.twitter; });
@@ -712,6 +713,7 @@ function injectContent() {
     const citationEl = document.getElementById('cta-citation');
     if (citationEl) citationEl.innerHTML = highlightCitationCode(c.cta.citation);
     set('cta-copyright', c.cta.copyright);
+    document.querySelectorAll('[data-link="cta-arxiv"]').forEach(a => { a.href = c.cta.links.arxiv; });
     document.querySelectorAll('[data-link="cta-github"]').forEach(a => { a.href = c.cta.links.github; });
     document.querySelectorAll('[data-link="cta-models"]').forEach(a => { a.href = c.cta.links.models; });
 }

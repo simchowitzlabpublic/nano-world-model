@@ -279,6 +279,24 @@ body::before {
     flex-shrink: 0;
 }
 
+.arxiv-logomark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 24px;
+    flex-shrink: 0;
+    overflow: hidden;
+    mix-blend-mode: multiply;
+}
+
+.arxiv-logomark img {
+    display: block;
+    width: 62px;
+    height: auto;
+    max-width: none;
+}
+
 .nav-btn:hover {
     background: #bd5d3a;
     color: #eeece2;
