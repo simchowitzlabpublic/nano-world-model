@@ -3,6 +3,7 @@
 </div>
 
 <div align="center">
+<a href='https://arxiv.org/abs/2605.23993'><img src='https://img.shields.io/badge/arXiv-2605.23993-b31b1b.svg'></a>
 <a href='https://huggingface.co/collections/knightnemo/nano-world-model'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Page-blue'></a>
 <a href='https://simchowitzlabpublic.github.io/nano-world-model/'><img src='https://img.shields.io/badge/Project-Page-Green'></a>
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"/></a>
@@ -153,12 +154,13 @@ We build upon a number of existing codebases: [Latte](https://github.com/Vchitec
 If you find this repository useful in your research, please consider citing:
 
 ```bibtex
-@misc{nanoworldmodels,
-  title={Nano World Model: A Minimalist, Batteries-Included Repository for Advancing World Model Science},
-  author={Siqiao Huang and Partha Kaushik and Michael Chen and Hengkai Pan and Kaiwen Geng and Omar Chehab and Fernando Moreno-Pino and Max Simchowitz},
+@misc{huang2026nanoworldmodels,
+  title={Nano World Models: A Minimalist Implementation of Future Video Prediction},
+  author={Siqiao Huang and Partha Kaushik and Michael Chen and Hengkai Pan and Omar Chehab and Fernando Moreno-Pino and Max Simchowitz},
   year={2026},
-  publisher={GitHub},
-  journal={GitHub repository},
-  howpublished={\url{https://github.com/simchowitzlabpublic/nano-world-model}},
+  eprint={2605.23993},
+  archivePrefix={arXiv},
+  primaryClass={cs.CV},
+  url={https://arxiv.org/abs/2605.23993},
 }
 ```
