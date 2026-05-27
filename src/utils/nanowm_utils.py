@@ -253,7 +253,7 @@ def find_model(model_name):
     Finds a pre-trained NanoWM model, downloading it if necessary. Alternatively, loads a model from a local path.
     """
     assert os.path.isfile(model_name), f'Could not find NanoWM checkpoint at {model_name}'
-    checkpoint = torch.load(model_name, map_location=lambda storage, loc: storage)
+    checkpoint = torch.load(model_name, map_location=lambda storage, loc: storage, weights_only=False)
         
     if "state_dict" in checkpoint:  # supports PyTorch Lightning checkpoints
         print('Using state_dict (PyTorch Lightning)!')
