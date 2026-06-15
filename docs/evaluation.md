@@ -25,7 +25,7 @@ curl -L "https://www.dropbox.com/scl/fi/c5nfs6c422nlpj880jbmh/i3d_torchscript.pt
 ```bash
 python src/main.py experiment=evaluate_only \
     dataset=dino_wm/pusht model=nanowm_b2 \
-    resume_from_checkpoint=<path/to/ckpt> \
+    experiment.resume_from_checkpoint=<path/to/ckpt> \
     dataset.loader.validation_fixed_subset_size=256 \
     dataset.loader.validation_fixed_subset_seed=42
 ```
@@ -133,7 +133,7 @@ Each row is a single eval command. Replace `<ckpt>` with the corresponding HF mo
 ```bash
 python src/main.py experiment=evaluate_only \
     dataset=<dataset> model=nanowm_b2 \
-    resume_from_checkpoint=<ckpt> \
+    experiment.resume_from_checkpoint=<ckpt> \
     dataset.loader.validation_fixed_subset_size=256 \
     dataset.loader.validation_fixed_subset_seed=42
 ```

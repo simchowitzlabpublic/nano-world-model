@@ -38,7 +38,7 @@ python src/main.py experiment=csgo dataset=game/csgo model=nanowm_l2_csgo
 
 # Evaluation
 python src/main.py experiment=evaluate_only dataset=dino_wm/pusht model=nanowm_b2 \
-    resume_from_checkpoint=<path/to/checkpoint.ckpt>
+    experiment.resume_from_checkpoint=<path/to/checkpoint.ckpt>
 
 # Planning
 python src/main.py experiment=planning dataset=dino_wm/point_maze model=nanowm_b2 \

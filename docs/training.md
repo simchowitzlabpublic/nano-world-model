@@ -39,8 +39,12 @@ python src/main.py experiment=dino_wm_pusht dataset=dino_wm/pusht model=nanowm_b
 
 # Resume from checkpoint
 python src/main.py experiment=csgo dataset=game/csgo model=nanowm_l2_csgo \
-    resume_from_checkpoint=<path/to/ckpt>
+    experiment.resume_from_checkpoint=<path/to/ckpt>
 ```
+
+`experiment.resume_from_checkpoint` resumes the full PyTorch Lightning trainer
+state during training (model, optimizer, scheduler, epoch/global step). For
+weight-only initialization or finetuning, use `experiment.pretrained=<path>`.
 
 Example scripts for the runs in the tables are provided
 under `src/scripts/train/`.

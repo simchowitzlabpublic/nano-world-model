@@ -1,6 +1,9 @@
 name: train
 tasks: [training]
+# Training: full Lightning resume (model/optimizer/scheduler/global_step).
+# Evaluation-only: load checkpoint weights before trainer.validate().
 resume_from_checkpoint: null
+# Weight-only initialization for finetuning; does not restore optimizer/global_step.
 pretrained: null
 
 training:

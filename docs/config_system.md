@@ -57,7 +57,7 @@ vjepa2_repo_path: ${oc.env:VJEPA2_REPO_PATH,null}
 results_dir:    ${oc.env:RESULTS_DIR,./results}
 ```
 
-Override any of these on the command line: `experiment=csgo`, `dataset=rt1/rt1`, `model=nanowm_l2`, etc. Override individual keys with `training.max_steps=100000`, `dataset.loader.validation_size=64`, etc.
+Override any of these on the command line: `experiment=csgo`, `dataset=rt1/rt1`, `model=nanowm_l2`, etc. Override individual keys with `experiment.training.max_steps=100000`, `dataset.loader.validation_size=64`, etc.
 
 ## Path configuration
 
@@ -129,7 +129,7 @@ python src/main.py experiment=csgo dataset=game/csgo model=nanowm_l2_csgo
 
 # Train DINO-WM PushT for 100k steps
 python src/main.py experiment=dino_wm_pusht dataset=dino_wm/pusht model=nanowm_b2 \
-    training.max_steps=100000
+    experiment.training.max_steps=100000
 
 # Switch action injection (any experiment)
 python src/main.py experiment=ablation_rt1 dataset=rt1/rt1 \
@@ -137,7 +137,7 @@ python src/main.py experiment=ablation_rt1 dataset=rt1/rt1 \
 
 # Resume from a checkpoint
 python src/main.py experiment=csgo dataset=game/csgo model=nanowm_l2_csgo \
-    resume_from_checkpoint=<path/to/ckpt>
+    experiment.resume_from_checkpoint=<path/to/ckpt>
 
 # Disable wandb for one run
 python src/main.py experiment=csgo dataset=game/csgo model=nanowm_l2_csgo \

@@ -545,12 +545,13 @@ class TrainExperiment(BaseExperiment):
         if not args.experiment.resume_from_checkpoint:
             return
 
-        self.logger.info(f"Attempting to load checkpoint from: {args.experiment.resume_from_checkpoint}")
+        checkpoint_path = self._resolve_checkpoint_path(args.experiment.resume_from_checkpoint)
+        self.logger.info(f"Attempting to load checkpoint weights from: {checkpoint_path}")
 
-        if not os.path.exists(args.experiment.resume_from_checkpoint):
-            raise FileNotFoundError(f"Checkpoint not found: {args.experiment.resume_from_checkpoint}")
+        if not os.path.exists(checkpoint_path):
+            raise FileNotFoundError(f"Checkpoint not found: {checkpoint_path}")
 
-        checkpoint = torch.load(args.experiment.resume_from_checkpoint, map_location="cpu")
+        checkpoint = torch.load(checkpoint_path, map_location="cpu")
 
         if "state_dict" in checkpoint:
             state_dict = checkpoint["state_dict"]
@@ -600,6 +601,23 @@ class TrainExperiment(BaseExperiment):
             raise RuntimeError(f"Checkpoint loading failed: {len(unexpected_keys)} unexpected keys found.")
 
         self.logger.info("Successfully loaded model weights with 100% match (VAE excluded).")
+
+    def _resolve_checkpoint_path(self, checkpoint_path):
+        """Resolve checkpoint paths robustly across Hydra's run-dir chdir."""
+        if not checkpoint_path:
+            return None
+        checkpoint_path = os.path.expanduser(str(checkpoint_path))
+        if os.path.isabs(checkpoint_path):
+            return checkpoint_path
+
+        candidates = [
+            checkpoint_path,
+            os.path.join(get_original_cwd(), checkpoint_path),
+        ]
+        for candidate in candidates:
+            if os.path.exists(candidate):
+                return os.path.abspath(candidate)
+        return checkpoint_path
 
     def _setup_common(self, need_train: bool):
         """Shared setup for both training() and evaluate() tasks.
@@ -677,7 +695,10 @@ class TrainExperiment(BaseExperiment):
                 self.logger.info(f"Using {len(val_dataset)} validation samples")
 
         pl_module = NanoWMTrainingModule(args)
-        if args.experiment.resume_from_checkpoint:
+        # For evaluation-only, load model weights into the module before
+        # trainer.validate(). For training, pass the checkpoint to Lightning's
+        # fit(..., ckpt_path=...) so optimizer/scheduler/global_step resume too.
+        if args.experiment.resume_from_checkpoint and not need_train:
             self._load_checkpoint(args, pl_module)
 
         callbacks_list = [CUDACallback()]
@@ -841,7 +862,15 @@ class TrainExperiment(BaseExperiment):
 
         # exec() already dispatches on self.tasks, so training() only does fit.
         # Evaluation is handled by the separate evaluate() method.
-        trainer.fit(pl_module, train_dataloaders=train_loader, val_dataloaders=val_loader)
+        ckpt_path = self._resolve_checkpoint_path(args.experiment.resume_from_checkpoint)
+        if ckpt_path:
+            self.logger.info(f"Resuming full Lightning trainer state from: {ckpt_path}")
+        trainer.fit(
+            pl_module,
+            train_dataloaders=train_loader,
+            val_dataloaders=val_loader,
+            ckpt_path=ckpt_path,
+        )
 
         pl_module.model.eval()
         self.logger.info("Done!")
