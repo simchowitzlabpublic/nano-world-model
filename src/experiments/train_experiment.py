@@ -80,6 +80,7 @@ class NanoWMTrainingModule(LightningModule):
             diffusion_steps=args.experiment.diffusion.diffusion_steps,
             snr_gamma=args.experiment.diffusion.snr_gamma,
             zero_terminal_snr=args.experiment.diffusion.zero_terminal_snr,
+            use_ot_coupling=getattr(args.experiment.diffusion, "use_ot_coupling", False),
         )
         self.latent_codec_config = resolve_latent_codec_config(args)
         print(

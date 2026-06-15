@@ -20,6 +20,19 @@ Key differences from GaussianDiffusion:
 
 API is intentionally identical to GaussianDiffusion so the training loop,
 sampling utilities, and dfot_sample() all work without modification.
+
+OT-CFM (mini-batch optimal transport, Tong et al. 2023)
+-------------------------------------------------------
+Standard FM samples (x_0, ε) independently, which produces crossing paths in
+latent space — conflicting gradients that force the model to learn a curved
+vector field.  OT-CFM instead solves a mini-batch assignment problem:
+
+    σ* = argmin_σ  Σᵢ ‖x_0ⁱ − ε^σ(ⁱ)‖²
+
+pairing each data point with the noise sample it is geometrically closest to.
+This minimises path crossings within the batch, yielding straighter trajectories
+and a simpler vector field.  Empirically this requires fewer inference steps
+and converges faster.  Opt-in; set use_ot_coupling=True to enable.
 """
 
 import enum
@@ -37,6 +50,28 @@ class PredName(enum.Enum):
 def _mean_flat(tensor: torch.Tensor) -> torch.Tensor:
     """Mean over all non-batch dimensions."""
     return tensor.mean(dim=list(range(1, len(tensor.shape))))
+
+
+def _ot_permute(x_start: torch.Tensor, noise: torch.Tensor) -> torch.Tensor:
+    """
+    Mini-batch optimal transport: permute noise to minimise total squared
+    distance to x_start (Tong et al. 2023, OT-CFM).
+
+    Uses the Hungarian algorithm on the [B, B] cost matrix.  The operation is
+    O(B³) but runs on CPU with float32 so it is fast for typical batch sizes
+    (B ≤ 64).  Gradients are not needed here — this is a data re-ordering step.
+    """
+    from scipy.optimize import linear_sum_assignment
+
+    B = x_start.shape[0]
+    if B == 1:
+        return noise  # nothing to permute
+
+    x_flat = x_start.detach().reshape(B, -1).float()
+    n_flat = noise.detach().reshape(B, -1).float()
+    cost = torch.cdist(x_flat, n_flat, p=2).pow(2).cpu().numpy()
+    _, col_ind = linear_sum_assignment(cost)
+    return noise[torch.from_numpy(col_ind).to(noise.device)]
 
 
 def _t_to_tau(t: torch.Tensor, num_timesteps: int) -> torch.Tensor:
@@ -78,9 +113,15 @@ class FlowMatching:
         Ignored (kept for API parity). Flow matching uses uniform loss weighting.
     """
 
-    def __init__(self, num_timesteps: int = 1000, snr_gamma: float = 0.0):
+    def __init__(
+        self,
+        num_timesteps: int = 1000,
+        snr_gamma: float = 0.0,
+        use_ot_coupling: bool = False,
+    ):
         self.num_timesteps = num_timesteps
         self.snr_gamma = snr_gamma  # unused, kept for API compat
+        self.use_ot_coupling = use_ot_coupling
 
         # Dummy betas array so any code that reads diffusion.betas doesn't crash.
         # All entries = 1/T so the cumulative product decays linearly, mirroring
@@ -133,6 +174,9 @@ class FlowMatching:
             model_kwargs = {}
         if noise is None:
             noise = torch.randn_like(x_start)
+
+        if self.use_ot_coupling:
+            noise = _ot_permute(x_start, noise)
 
         x_t = self.q_sample(x_start, t, noise=noise)
         target = x_start - noise  # u = x_0 - ε

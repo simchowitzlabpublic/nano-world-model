@@ -48,6 +48,7 @@ def create_diffusion(
     diffusion_steps,
     snr_gamma,
     zero_terminal_snr,
+    use_ot_coupling: bool = False,
 ):
     """Build a (possibly respaced) Gaussian diffusion.
 
@@ -85,7 +86,11 @@ def create_diffusion(
 
     # Flow matching is a separate code path — no beta schedule, no DDIM.
     if pred_name_map[pred_name] is _FlowPredName.FLOW:
-        return FlowMatching(num_timesteps=diffusion_steps, snr_gamma=snr_gamma)
+        return FlowMatching(
+            num_timesteps=diffusion_steps,
+            snr_gamma=snr_gamma,
+            use_ot_coupling=use_ot_coupling,
+        )
 
     if pred_name_map[pred_name] == gd.PredName.EPSILON:
         import warnings
