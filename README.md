@@ -33,6 +33,8 @@ A minimalist repository for training video world models based on diffusion-forci
 
 ## 🚀 Quick Start
 
+> No local GPU? Run a pretrained checkpoint end-to-end on free-tier Colab via the [Colab quickstart notebook](colab_quickstart.ipynb).
+
 ```bash
 git clone https://github.com/simchowitzlabpublic/nano-world-model.git
 cd nano-world-model
