@@ -144,10 +144,11 @@ class MetricsLogger(Callback):
         gather_val_metrics_buffer = pl_module.all_gather(self.val_metrics_buffer)
         
         # Flatten the gathered tensors
+        feature_keys = {"raw_gt_features", "raw_pred_features", "real_stats", "fake_stats"}
         for key, value in gather_val_metrics_buffer.items():
-            if value.ndim > 2: # Features or stats
-                gather_val_metrics_buffer[key] = value.reshape(-1, *value.shape[2:])
-            else: # Scalars
+            if key in feature_keys:
+                gather_val_metrics_buffer[key] = value.reshape(-1, value.shape[-1])
+            else:
                 gather_val_metrics_buffer[key] = value.reshape(-1)
 
         with torch.no_grad():
