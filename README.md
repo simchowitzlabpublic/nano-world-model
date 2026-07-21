@@ -141,6 +141,7 @@ NanoWM rollouts can be used directly for downstream applications, including long
 
 </div>
 
+- **[PixelWM](docs/applications/pixelwm.md)** — identity-coded RGB training, evaluation, rollout, planning, and video-to-3D
 - **[Long-horizon rollout](docs/applications/long_rollout.md)** — autoregressive rollout from trained checkpoints
 - **[Video → 3D map](docs/applications/video_to_3d.md)** — Depth Anything 3 point cloud reconstruction from rollout videos
 - **[MPC-style planning](docs/applications/planning.md)** — CEM planning over world model rollouts
@@ -151,6 +152,7 @@ NanoWM rollouts can be used directly for downstream applications, including long
 - **[docs/training.md](docs/training.md)** — training workflow, design choices, ablation tables, all checkpoints
 - **[docs/evaluation.md](docs/evaluation.md)** — evaluation workflow, metric definitions, full result tables
 - **[docs/datasets/README.md](docs/datasets/README.md)** — DINO-WM / RT-1 / CSGO formats, downloads, splits
+- **[docs/applications/pixelwm.md](docs/applications/pixelwm.md)** — identity-coded RGB PixelWM workflows
 - **[docs/applications/planning.md](docs/applications/planning.md)** — MPC + CEM model-predictive control
 - **[docs/applications/long_rollout.md](docs/applications/long_rollout.md)** — long-horizon autoregressive rollout
 - **[docs/applications/video_to_3d.md](docs/applications/video_to_3d.md)** — Depth Anything 3 point cloud pipeline

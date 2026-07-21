@@ -33,7 +33,7 @@ python src/sample/rollout.py \
     --history_stabilization_level 0.02 --fps 8
 ```
 
-The `--config` path is the `.hydra/config.yaml` snapshot from the training run that produced the checkpoint — `rollout.py` needs the matching dataset / model config to decode actions and frames consistently.
+The `--config` path is the `.hydra/config.yaml` snapshot from the training run that produced the checkpoint — `rollout.py` needs the matching dataset / model / latent-codec config to process actions and frames consistently. Identity-coded RGB examples are in the [PixelWM guide](pixelwm.md).
 
 ## Knobs
 

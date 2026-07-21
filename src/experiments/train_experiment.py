@@ -83,8 +83,12 @@ class NanoWMTrainingModule(LightningModule):
         )
         self.latent_codec_config = resolve_latent_codec_config(args)
         print(
-            f"[Init] Loading latent codec={self.latent_codec_config.kind} "
-            f"from: {self.latent_codec_config.model_path}",
+            f"[Init] Building latent codec={self.latent_codec_config.kind}"
+            + (
+                f" from: {self.latent_codec_config.model_path}"
+                if self.latent_codec_config.model_path is not None
+                else ""
+            ),
             flush=True,
         )
         self.latent_codec = build_latent_codec(args)
@@ -94,7 +98,7 @@ class NanoWMTrainingModule(LightningModule):
         self._vae_precision = self.latent_codec_config.precision
         print(
             f"[Init] Latent codec loaded, shape={self.latent_codec_config.latent_shape.as_tuple()}, "
-            f"scaling_factor={self.vae_scale_factor}, vae_precision={self._vae_precision}",
+            f"scaling_factor={self.vae_scale_factor}, codec_precision={self._vae_precision}",
             flush=True,
         )
         self._sanity_check_latent_codec(args)

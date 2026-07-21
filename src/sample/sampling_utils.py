@@ -1,33 +1,26 @@
-"""
-Shared utility functions for video sampling and rollout scripts.
-Provides VAE encoding/decoding, video saving, and frame resizing.
-"""
+"""Shared utility functions for video sampling and rollout scripts."""
 
 import torch
 import imageio
 from einops import rearrange
 
-from utils.vae_ops import encode_first_stage, decode_first_stage
 
-
-def encode_frames(vae, frames, device, vae_precision: str = "fp32"):
-    """Encode [B,F,C,H,W] frames to [B,F,C_lat,H/8,W/8] scaled latents."""
-    B, F, C, H, W = frames.shape
-    frames = frames.to(device)
-    frames_flat = rearrange(frames, 'b f c h w -> (b f) c h w')
+def encode_frames(codec, frames, device):
+    """Encode [B,F,C,H,W] normalized frames through a latent codec."""
+    B = frames.shape[0]
+    frames_flat = rearrange(frames.to(device), 'b f c h w -> (b f) c h w')
     with torch.no_grad():
-        latents = encode_first_stage(vae, frames_flat, precision=vae_precision)
+        latents = codec.encode(frames_flat)
     return rearrange(latents, '(b f) c h w -> b f c h w', b=B)
 
 
-def decode_latents(vae, latents, vae_precision: str = "fp32"):
-    """Decode [B,F,C_lat,H/8,W/8] scaled latents to [B,F,C,H,W] frames in [0,1]."""
-    B, F = latents.shape[:2]
+def decode_latents(codec, latents):
+    """Decode [B,F,C,H,W] latents to normalized frames without clipping."""
+    B = latents.shape[0]
     latents_flat = rearrange(latents, 'b f c h w -> (b f) c h w')
     with torch.no_grad():
-        frames = decode_first_stage(vae, latents_flat, precision=vae_precision)
-    frames = rearrange(frames, '(b f) c h w -> b f c h w', b=B)
-    return ((frames + 1) / 2).clamp(0, 1)
+        frames = codec.decode(latents_flat)
+    return rearrange(frames, '(b f) c h w -> b f c h w', b=B)
 
 
 def save_video(frames, save_path, fps):
@@ -35,10 +28,11 @@ def save_video(frames, save_path, fps):
     Save frames as an MP4 video file.
 
     Args:
-        frames: [F, C, H, W] tensor in range [0, 1]
+        frames: [F, C, H, W] tensor normalized to [-1, 1]
         save_path: Output file path
         fps: Frames per second
     """
+    frames = ((frames + 1) / 2).clamp(0, 1)
     video = (frames * 255).to(dtype=torch.uint8).cpu().permute(0, 2, 3, 1).numpy()
     imageio.mimwrite(save_path, video, fps=fps, quality=9)
 
@@ -48,8 +42,8 @@ def save_comparison_video(gt_frames, pred_frames, save_path, fps):
     Save side-by-side comparison video (ground truth | prediction).
 
     Args:
-        gt_frames: [F, C, H, W] tensor in range [0, 1]
-        pred_frames: [F, C, H, W] tensor in range [0, 1]
+        gt_frames: [F, C, H, W] tensor normalized to [-1, 1]
+        pred_frames: [F, C, H, W] tensor normalized to [-1, 1]
         save_path: Output file path
         fps: Frames per second
     """

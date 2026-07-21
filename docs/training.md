@@ -69,7 +69,7 @@ Monitor with `tensorboard --logdir ${RESULTS_DIR}/<run_dir>/tb`, or set `wandb.e
 
 ## Training loop, in one paragraph
 
-PyTorch Lightning drives the loop. Each step samples a `[B, T, 3, H, W]` clip, encodes frames to VAE latents, samples per-frame diffusion timesteps (logit-normal by default, SD3-style), denoises with the NanoWM transformer, computes the prediction-target loss (v / x / ε / flow), and steps the optimizer (AdamW, lr=1e-4, warmup=1000, cosine decay). Validation runs every `val_every_n_steps` (default 1k); FID/FVD every `metrics.log_every_n_train_steps` (default 5k). Checkpoints save to `latest/` every 1k steps and to `across_timesteps/` every 10k.
+PyTorch Lightning drives the loop. Each step samples a `[B, T, 3, H, W]` clip, encodes frames through the configured latent codec (an identity mapping for [PixelWM](applications/pixelwm.md)), samples per-frame diffusion timesteps (logit-normal by default, SD3-style), denoises with the NanoWM transformer, computes the prediction-target loss (v / x / ε / flow), and steps the optimizer (AdamW, lr=1e-4, warmup=1000, cosine decay). Validation runs every `val_every_n_steps` (default 1k); FID/FVD every `metrics.log_every_n_train_steps` (default 5k). Checkpoints save to `latest/` every 1k steps and to `across_timesteps/` every 10k.
 
 Knobs: `experiment.training.{batch_size, max_steps, gradient_clip_norm}`, `experiment.diffusion.{pred_name, noise_schedule, zero_terminal_snr, snr_gamma, timestep_sampling}`, `experiment.infra.{mixed_precision, num_workers, compile}`. See [config_system.md](config_system.md) for the full reference.
 

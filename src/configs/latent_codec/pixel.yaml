@@ -1,0 +1,3 @@
+kind: pixel
+latent_channels: ${model.latent_channels}
+precision: match_trainer

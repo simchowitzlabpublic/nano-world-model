@@ -58,7 +58,7 @@ python src/scripts/video_to_pointcloud.py \
     --visualize
 ```
 
-If your video is already at the correct aspect ratio, omit `--native_res`.
+If your video is already at the correct aspect ratio, omit `--native_res`. PixelWM rollout MP4s follow the same RGB input contract; see the [PixelWM guide](pixelwm.md).
 
 ### With interactive viewer
 

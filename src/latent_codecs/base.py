@@ -4,7 +4,7 @@ from typing import Literal, Protocol, runtime_checkable
 import torch
 
 
-LatentCodecKind = Literal["sd_vae", "webdino", "vjepa2_1"]
+LatentCodecKind = Literal["sd_vae", "webdino", "vjepa2_1", "pixel"]
 
 
 @dataclass(frozen=True)
@@ -20,7 +20,7 @@ class LatentShape:
 @dataclass(frozen=True)
 class LatentCodecConfig:
     kind: LatentCodecKind
-    model_path: str
+    model_path: str | None
     latent_shape: LatentShape
     precision: str
     has_decoder: bool

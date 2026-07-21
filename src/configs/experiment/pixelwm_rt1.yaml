@@ -1,0 +1,11 @@
+# @package _global_
+
+defaults:
+  - /experiment/rt1@experiment
+  - override /model: pixelwm_b16
+  - override /latent_codec: pixel
+  - _self_
+
+experiment:
+  diffusion:
+    pred_name: x

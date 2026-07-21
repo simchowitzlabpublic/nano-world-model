@@ -18,9 +18,9 @@ from omegaconf import OmegaConf
 from tqdm.auto import tqdm
 
 from latent_codecs import (
+    build_latent_codec,
     get_model_latent_channels,
     get_model_latent_size,
-    load_autoencoder_kl,
     resolve_latent_codec_config,
 )
 from models import get_models
@@ -91,15 +91,13 @@ def main(args):
     
     model.eval()
     
-    print("Loading VAE...")
+    print("Loading latent codec...")
     codec_cfg = resolve_latent_codec_config(args)
     if not codec_cfg.has_decoder:
         raise NotImplementedError(
             f"sample_dfot.py requires a decoder, but latent_codec.kind={codec_cfg.kind} is encoder-only"
         )
-    vae = load_autoencoder_kl(codec_cfg.model_path).to(device)
-    vae.eval()
-    vae_precision = getattr(args.experiment.infra, "vae_precision", "fp32")
+    codec = build_latent_codec(args).to(device).eval()
     
     # Create diffusion
     diffusion = create_diffusion(
@@ -132,15 +130,13 @@ def main(args):
         if sample_count >= args.num_samples:
             break
         
-        # Debug: print batch keys (only first batch)
-        if batch_idx == 0:
-            print(f"[DEBUG] Batch keys: {list(batch.keys())}")
-            if args.verbose:
-                for k, v in batch.items():
-                    if isinstance(v, torch.Tensor):
-                        print(f"  {k}: shape={v.shape}, dtype={v.dtype}")
-                    else:
-                        print(f"  {k}: {type(v)}")
+        if batch_idx == 0 and args.verbose:
+            print(f"Batch keys: {list(batch.keys())}")
+            for k, v in batch.items():
+                if isinstance(v, torch.Tensor):
+                    print(f"  {k}: shape={v.shape}, dtype={v.dtype}")
+                else:
+                    print(f"  {k}: {type(v)}")
         
         # Get visual observations: [B, F, C, H, W]
         # batch is a dict when load_raw=False, matching train_pl.py format
@@ -173,7 +169,7 @@ def main(args):
                     print(f"[Action Loading] Generated random action, shape: {action.shape}")
         
         # Encode to latent space
-        gt_latents = encode_frames(vae, visual, device, vae_precision=vae_precision)
+        gt_latents = encode_frames(codec, visual, device)
         
         # Debug: print ranges (only first batch)
         if batch_idx == 0 and args.verbose:
@@ -218,8 +214,8 @@ def main(args):
             print(f"  context latent diff (should be ~0): {ctx_diff:.6f}")
         
         # Decode latents
-        gt_frames = decode_latents(vae, gt_latents, vae_precision=vae_precision)
-        pred_frames = decode_latents(vae, pred_latents, vae_precision=vae_precision)
+        gt_frames = decode_latents(codec, gt_latents)
+        pred_frames = decode_latents(codec, pred_latents)
         
         # Debug: print decoded ranges
         if batch_idx == 0 and args.verbose:

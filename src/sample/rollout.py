@@ -19,9 +19,9 @@ from omegaconf import OmegaConf
 from tqdm.auto import tqdm
 
 from latent_codecs import (
+    build_latent_codec,
     get_model_latent_channels,
     get_model_latent_size,
-    load_autoencoder_kl,
     resolve_latent_codec_config,
 )
 from models import get_models
@@ -64,15 +64,13 @@ def main(args):
     
     model.eval()
     
-    print("Loading VAE...")
+    print("Loading latent codec...")
     codec_cfg = resolve_latent_codec_config(args)
     if not codec_cfg.has_decoder:
         raise NotImplementedError(
             f"rollout.py requires a decoder, but latent_codec.kind={codec_cfg.kind} is encoder-only"
         )
-    vae = load_autoencoder_kl(codec_cfg.model_path).to(device)
-    vae.eval()
-    vae_precision = getattr(args.experiment.infra, "vae_precision", "fp32")
+    codec = build_latent_codec(args).to(device).eval()
     
     diffusion = create_diffusion(
         timestep_respacing=str(args.model.num_sampling_steps),
@@ -178,7 +176,7 @@ def main(args):
         gt_visual = torch.stack(batch_visual_list, dim=0).to(device)
         batch_raw_actions = torch.stack(batch_raw_actions_list, dim=0).to(device) 
         
-        gt_latents = encode_frames(vae, gt_visual, device, vae_precision=vae_precision)
+        gt_latents = encode_frames(codec, gt_visual, device)
         generated_latents = gt_latents[:, :history_length]
         
         # Now every sample in the batch has exactly rollout_length frames
@@ -225,8 +223,8 @@ def main(args):
             generated_latents = torch.cat([generated_latents, new_latent], dim=1)
             
         print(f"Decoding and saving batch results...")
-        gen_frames_batch = decode_latents(vae, generated_latents, vae_precision=vae_precision)
-        gt_frames_batch = decode_latents(vae, gt_latents, vae_precision=vae_precision)
+        gen_frames_batch = decode_latents(codec, generated_latents)
+        gt_frames_batch = decode_latents(codec, gt_latents)
         
         for i in range(current_batch_size):
             sample_id = start_idx + i
@@ -280,9 +278,13 @@ if __name__ == "__main__":
             'history_stabilization_level'
         ] = cli_args['history_stabilization_level']
 
+    # Legacy SD-VAE path override.
+    if cli_args.get('vae_model_path') is not None:
+        cli_overrides.setdefault('latent_codec', {})['model_path'] = cli_args['vae_model_path']
+
     # Top-level / non-hierarchical CLI args
     for key in ('ckpt', 'save_path', 'num_samples', 'batch_size', 'rollout_length',
-                'history_length', 'fps', 'eta', 'use_fp16', 'vae_model_path'):
+                'history_length', 'fps', 'eta', 'use_fp16'):
         val = cli_args.get(key)
         if val is not None:
             cli_overrides[key] = val

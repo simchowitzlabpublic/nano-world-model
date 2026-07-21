@@ -4,6 +4,7 @@ from diffusers.models import AutoencoderKL
 from omegaconf import OmegaConf
 
 from .base import LatentCodecConfig, LatentShape
+from .pixel import PixelCodec
 from .semantic import VJEPA21LatentCodec, WebDINOLatentCodec
 from .sd_vae import SDVAELatentCodec
 
@@ -30,14 +31,17 @@ def resolve_latent_codec_config(cfg) -> LatentCodecConfig:
     `model.latent_size`. Those resolve to the same SD-VAE codec and 4-channel
     latent shape used by the original code.
     """
+    if isinstance(cfg, LatentCodecConfig):
+        return cfg
+
     kind = _select(cfg, "latent_codec.kind", None) or _select(cfg, "latent_codec.name", None) or "sd_vae"
     if kind == "vae":
         kind = "sd_vae"
-    if kind not in ("sd_vae", "webdino", "vjepa2_1"):
+    if kind not in ("sd_vae", "webdino", "vjepa2_1", "pixel"):
         raise NotImplementedError(f"latent_codec.kind={kind!r} is not wired yet")
 
     model_path = _select(cfg, "latent_codec.model_path", None) or _select(cfg, "latent_codec.vae_model_path", None)
-    if model_path is None:
+    if model_path is None and kind != "pixel":
         if kind == "sd_vae":
             model_path = _select(cfg, "vae_model_path", "stabilityai/sd-vae-ft-mse")
         else:
@@ -59,7 +63,11 @@ def resolve_latent_codec_config(cfg) -> LatentCodecConfig:
     input_size = _select(cfg, "latent_codec.input_size", None)
     patch_size = _select(cfg, "latent_codec.patch_size", None)
 
-    if kind == "sd_vae":
+    if kind == "pixel":
+        has_decoder = True
+        input_size = int(input_size) if input_size is not None else int(_select(cfg, "model.image_size", 256))
+        patch_size = None
+    elif kind == "sd_vae":
         has_decoder = True
         input_size = int(input_size) if input_size is not None else int(_select(cfg, "model.image_size", 256))
         patch_size = int(patch_size) if patch_size is not None else 8
@@ -74,7 +82,7 @@ def resolve_latent_codec_config(cfg) -> LatentCodecConfig:
 
     return LatentCodecConfig(
         kind=kind,
-        model_path=str(model_path),
+        model_path=str(model_path) if model_path is not None else None,
         latent_shape=LatentShape(
             channels=latent_channels,
             height=latent_size,
@@ -114,6 +122,11 @@ def build_sd_vae_codec(vae: AutoencoderKL, cfg) -> SDVAELatentCodec:
 
 def build_latent_codec(cfg):
     codec_cfg = resolve_latent_codec_config(cfg)
+    if codec_cfg.kind == "pixel":
+        return PixelCodec(
+            latent_shape=codec_cfg.latent_shape,
+            precision=codec_cfg.precision,
+        )
     if codec_cfg.kind == "sd_vae":
         vae = load_autoencoder_kl(codec_cfg.model_path)
         return build_sd_vae_codec(vae, cfg)

@@ -783,6 +783,9 @@ def NanoWM_B_4(**kwargs):
 def NanoWM_B_8(**kwargs):
     return NanoWM(depth=12, hidden_size=768, patch_size=8, num_heads=12, **kwargs)
 
+def NanoWM_B_16(**kwargs):
+    return NanoWM(depth=12, hidden_size=768, patch_size=16, num_heads=12, **kwargs)
+
 def NanoWM_S_2(**kwargs):
     return NanoWM(depth=12, hidden_size=384, patch_size=2, num_heads=6, **kwargs)
 
@@ -799,7 +802,7 @@ def NanoWM_S_8(**kwargs):
 NanoWM_models = {
     'NanoWM-XL/2': NanoWM_XL_2,  'NanoWM-XL/4': NanoWM_XL_4,  'NanoWM-XL/8': NanoWM_XL_8,
     'NanoWM-L/1':  NanoWM_L_1,   'NanoWM-L/2':  NanoWM_L_2,   'NanoWM-L/4':  NanoWM_L_4,   'NanoWM-L/8':  NanoWM_L_8,
-    'NanoWM-B/1':  NanoWM_B_1,   'NanoWM-B/2':  NanoWM_B_2,   'NanoWM-B/4':  NanoWM_B_4,   'NanoWM-B/8':  NanoWM_B_8,
+    'NanoWM-B/1':  NanoWM_B_1,   'NanoWM-B/2':  NanoWM_B_2,   'NanoWM-B/4':  NanoWM_B_4,   'NanoWM-B/8':  NanoWM_B_8,   'NanoWM-B/16': NanoWM_B_16,
     'NanoWM-S/1':  NanoWM_S_1,   'NanoWM-S/2':  NanoWM_S_2,   'NanoWM-S/4':  NanoWM_S_4,   'NanoWM-S/8':  NanoWM_S_8,
 }
 

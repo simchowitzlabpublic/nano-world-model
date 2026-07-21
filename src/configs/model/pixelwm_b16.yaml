@@ -1,0 +1,15 @@
+arch: NanoWM-B/16
+name: PixelWM-B-16
+num_frames: 4
+n_context_frames: 1
+scheduling_mode: "sequential"
+num_sampling_steps: 250
+use_action: true
+action_injection:
+  type: additive
+causal: true
+image_size: 256
+latent_size: 256
+latent_channels: 3
+extras: 1
+num_classes: 1000

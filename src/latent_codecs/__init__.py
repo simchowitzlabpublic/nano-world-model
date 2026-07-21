@@ -7,6 +7,7 @@ from .factory import (
     load_autoencoder_kl,
     resolve_latent_codec_config,
 )
+from .pixel import PixelCodec
 from .sd_vae import SDVAELatentCodec
 from .semantic import VJEPA21LatentCodec, WebDINOLatentCodec
 
@@ -14,6 +15,7 @@ __all__ = [
     "LatentCodec",
     "LatentCodecConfig",
     "LatentShape",
+    "PixelCodec",
     "SDVAELatentCodec",
     "VJEPA21LatentCodec",
     "WebDINOLatentCodec",

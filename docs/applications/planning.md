@@ -1,6 +1,6 @@
 # Planning (MPC + CEM)
 
-CEM-style model-predictive control over the diffusion world model. Each plan samples action sequences, rolls them out through the WM in VAE-latent space, scores them by MSE against a goal latent, and updates the sampling distribution toward the elites — a direct analogue of the [DINO-WM](https://github.com/gaoyuezhou/dino_wm) planning protocol but with a diffusion rollout.
+CEM-style model-predictive control over the diffusion world model. Each plan samples action sequences, rolls them out through the WM's configured latent codec, scores them by MSE against a goal representation, and updates the sampling distribution toward the elites — a direct analogue of the [DINO-WM](https://github.com/gaoyuezhou/dino_wm) planning protocol but with a diffusion rollout. For identity-coded RGB commands and memory notes, see the [PixelWM guide](pixelwm.md).
 
 ## Setup
 
