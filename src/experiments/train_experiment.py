@@ -857,7 +857,7 @@ class TrainExperiment(BaseExperiment):
             val_check_interval=val_check_interval,
             check_val_every_n_epoch=None,
             accumulate_grad_batches=args.experiment.training.gradient_accumulation,
-            precision="bf16-mixed" if args.experiment.infra.mixed_precision else "32",
+            precision="bf16" if args.experiment.infra.mixed_precision else "32",
             num_sanity_val_steps=0,
         )
 
@@ -906,7 +906,7 @@ class TrainExperiment(BaseExperiment):
             enable_checkpointing=False,  # No checkpointing during evaluation
             logger=loggers,
             callbacks=callbacks_list,
-            precision="bf16-mixed" if args.experiment.infra.mixed_precision else "32",
+            precision="bf16" if args.experiment.infra.mixed_precision else "32",
             num_sanity_val_steps=0,
         )
 
