@@ -3,7 +3,7 @@ channels:
   - pytorch
   - nvidia
 dependencies:
-  - python >= 3.10
+  - python == 3.11
   - pytorch >=2.2.1,<2.8.0
   - torchvision
   - pytorch-cuda >= 11.7
@@ -24,7 +24,7 @@ dependencies:
     - torchmetrics
 
     # Diffusion / generative
-    - diffusers[torch]==0.27.2
+    - diffusers[torch]==0.29.2
     - accelerate
     - transformers
 
@@ -58,3 +58,4 @@ dependencies:
     - beautifulsoup4
     - ftfy
     - protobuf==4.25.3
+    - setuptools<81
